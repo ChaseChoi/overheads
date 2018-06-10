@@ -45,7 +45,7 @@ parser.add_argument('-m', '--month', required=True, choices=range(1, 13), type=i
 parser.add_argument('-p', '--position', required=True, choices={'西一', '西二', '西三', '西四', '西五', '西六', 
 	'东四', '东九', '东十', '东十二', '东十三', '东十四', '东十五', '东十六', '东十九', '星河楼', '陶南', '陶北', 
 	'沁园', '研究生公寓'}, help='Specify the position of your dormitory', action='store', dest='position')
-parser.add_argument('-n', '--number', required=True, help='Specify the room number', action='store', dest='number')
+parser.add_argument('-n', '--number', required=True, help='Specify the room number', metavar='{room number}', action='store', dest='number')
 args = parser.parse_args()
 # extract args 
 year = args.year

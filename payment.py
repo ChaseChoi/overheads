@@ -53,6 +53,11 @@ roomNum = args.number
 position = '{}{}{}'.format(args.position, unit, roomNum)
 positionCode = '{}{}{}'.format(shipai, getPositionCode(args.position), roomNum)
 myID = '{}{:02d}{}'.format(year, month, positionCode)
+# display basic info
+previous = (month-1) % 12
+if previous == 0:
+	previous = 12
+print('---{}月电费---'.format(previous))
 print('网址: {}\n人员编号: {}\n宿舍: {}'.format(url, myID, position))
 
 # headless browser

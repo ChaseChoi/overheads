@@ -166,5 +166,6 @@ try:
 	print('Scan QR code!')
 	img = Image.open(pathOfScreenShot)
 	img.show()
-finally:
-    browser.quit()
+except Exception:
+	print('目前是银行结算时间，请在每天的03：30~22：00时间段内进行交费，谢谢合作。')
+	browser.quit()

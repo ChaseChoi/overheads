@@ -14,14 +14,12 @@ def getPositionCode(position):
 	number = position[1:]
 
 	directions = {'东': 'E', '西': 'W'}
-	west = {'一': '01', '二': '02', '三': '03', '四': '04', '五': '05', '六': '06'}
-	east = {'四': '04', '九': '09', '十': '10', '十二': '12', '十三': '13', '十四': '14', '十五': '15', '十六': '16', '十九': '19'}
-	if direction == '东':
+	numbers = {'一': '01', '二': '02', '三': '03', '四': '04', '五': '05', 
+	'六': '06', '九': '09', '十': '10', '十二': '12', '十三': '13', 
+	'十四': '14', '十五': '15', '十六': '16', '十九': '19'}
+	if direction == '东' or direction == '西':
 		code = directions[direction]
-		code += east[number]
-	elif direction == '西':
-		code = directions[direction]
-		code += west[number]
+		code += numbers[number]
 	else:
 		special = {'星河楼': 'XHL', '陶南': 'TTN', '陶北': 'TTB', '沁园': 'TQY', '研究生公寓': 'YGY'}
 		code = special[position]

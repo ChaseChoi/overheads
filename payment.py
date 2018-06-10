@@ -97,16 +97,16 @@ try:
 		EC.presence_of_element_located((By.XPATH, '//*[@id="payForm"]/table/tbody/tr[5]/td/input'))
 	)
 	status = statusElem.text
+	print('='*16)
 	print('支付情况: {}'.format(status))
+	print('='*16)
 	if status == '已支付':
-		print("\n===You've paid for it!===\nSee you!")
 		browser.quit()
 		sys.exit()
 	else:
-		print("\n===You have to pay for it!===\n")
 		# get payment code
 		payCode = payCodeElem.text
-		print('Pay code: {}'.format(payCode))
+		print('支付码: {}'.format(payCode))
 
 		# copy to clipboard
 		pyperclip.copy(payCode)
@@ -117,7 +117,7 @@ try:
 		payCodeInputBox.send_keys(payCode);
 		# confirm paycode
 		confirmPayCodeBtn.click()
-
+		# switch to payment page
 		browser.switch_to_window(browser.window_handles[-1])
 except Exception:
 	print("===无效月份!(或 网络连接失败)===")
@@ -126,7 +126,7 @@ except Exception:
 
 
 
-# check amount of money to pay and choose wechat 
+# check amount of money to pay and choose Wechat 
 try:
 	amount = WebDriverWait(browser, 5).until(
 		EC.presence_of_element_located((By.XPATH, '//*[@id="print_pay"]/table/tbody/tr[6]/td[2]/strong'))

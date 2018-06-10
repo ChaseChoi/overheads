@@ -35,21 +35,18 @@ filename = 'QRcode.png'
 desktopPath = os.path.expanduser('~/Desktop')
 pathOfScreenShot = os.path.join(desktopPath, filename)
 
-# get the current year
+# get the current year and month
 now = datetime.now()
-yearCurrent = now.year
+year = now.year
+month = now.month
 # set argument options
 parser = argparse.ArgumentParser(description='Simple app to pay for overheads in SCNU(tianhe, Guangzhou)')
-parser.add_argument('-y', '--year', required=True, choices=range(yearCurrent-1, yearCurrent+1), type=int, help='Specify the year', action='store', dest='year')
-parser.add_argument('-m', '--month', required=True, choices=range(1, 13), type=int, help='Specify the month', action='store', dest='month')
 parser.add_argument('-p', '--position', required=True, choices={'西一', '西二', '西三', '西四', '西五', '西六', 
 	'东四', '东九', '东十', '东十二', '东十三', '东十四', '东十五', '东十六', '东十九', '星河楼', '陶南', '陶北', 
 	'沁园', '研究生公寓'}, help='Specify the position of your dormitory', action='store', dest='position')
 parser.add_argument('-n', '--number', required=True, help='Specify the room number', metavar='{room number}', action='store', dest='number')
 args = parser.parse_args()
 # extract args 
-year = args.year
-month = args.month
 roomNum = args.number
 
 # generate id number

@@ -9,21 +9,26 @@ from PIL import Image
 import argparse
 from datetime import datetime
 
-def getPositionCode(position):
-	direction = position[0]
-	number = position[1:]
+def getPositionCode(area, buildingName, unit, roomNum):
+	direction = buildingName[0]
+	buildingNum = buildingName[1:]
 
 	directions = {'东': 'E', '西': 'W'}
 	numbers = {'一': '01', '二': '02', '三': '03', '四': '04', '五': '05', 
 	'六': '06', '九': '09', '十': '10', '十二': '12', '十三': '13', 
 	'十四': '14', '十五': '15', '十六': '16', '十九': '19'}
 	if direction == '东' or direction == '西':
+		position = '{}{}{}'.format(buildingName, unit, roomNum)
 		code = directions[direction]
-		code += numbers[number]
+		code += numbers[buildingNum]
 	else:
 		special = {'星河楼': 'XHL', '陶南': 'TTN', '陶北': 'TTB', '沁园': 'TQY', '研究生公寓': 'YGY'}
-		code = special[position]
-	return code
+		code = special[buildingName]
+		position = '{}{}'.format(buildingName, roomNum)
+
+	positionCode = '{}{}{}'.format(area, code, roomNum)
+	return position, positionCode
+	
 
 # set basic info
 shipai = '01'
@@ -39,17 +44,17 @@ year = now.year
 month = now.month
 # set argument options
 parser = argparse.ArgumentParser(description='Simple app to pay for overheads in SCNU(tianhe, Guangzhou)')
-parser.add_argument('-p', '--position', required=True, choices={'西一', '西二', '西三', '西四', '西五', '西六', 
+parser.add_argument('-p', '--position', default='西三', choices={'西一', '西二', '西三', '西四', '西五', '西六', 
 	'东四', '东九', '东十', '东十二', '东十三', '东十四', '东十五', '东十六', '东十九', '星河楼', '陶南', '陶北', 
 	'沁园', '研究生公寓'}, help='Specify the position of your dormitory', action='store', dest='position')
-parser.add_argument('-n', '--number', required=True, help='Specify the room number', metavar='{room number}', action='store', dest='number')
+parser.add_argument('-n', '--number', default='401', help='Specify the room number', metavar='{room number}', action='store', dest='number')
 args = parser.parse_args()
 # extract args 
 roomNum = args.number
+buildingName = args.position
 
 # generate id number
-position = '{}{}{}'.format(args.position, unit, roomNum)
-positionCode = '{}{}{}'.format(shipai, getPositionCode(args.position), roomNum)
+position, positionCode = getPositionCode(shipai, buildingName, unit, roomNum)
 myID = '{}{:02d}{}'.format(year, month, positionCode)
 # display basic info
 previous = (month-1) % 12

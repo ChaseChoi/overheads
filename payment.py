@@ -2,6 +2,7 @@
 from selenium import webdriver
 import pyperclip, sys, os
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
@@ -124,12 +125,10 @@ try:
 		confirmPayCodeBtn.click()
 		# switch to payment page
 		browser.switch_to_window(browser.window_handles[-1])
-except Exception:
-	print("===无效宿舍号!(或 网络连接失败)===")
+except TimeoutException:
+	print("===无效宿舍号!(或 无网络连接)===")
 	browser.quit()
 	sys.exit()
-
-
 
 # check amount of money to pay and choose Wechat 
 try:
@@ -148,8 +147,8 @@ try:
 
 	wechatOption.click()
 	payAllBtn.click()
-except Exception:
-	print('No payment info!')
+except TimeoutException:
+	print('支付信息获取失败!')
 	browser.quit()
 	sys.exit()
 
@@ -166,7 +165,7 @@ try:
 	print('Scan QR code!')
 	img = Image.open(pathOfScreenShot)
 	img.show()
-except Exception:
+except TimeoutException:
 	print('目前是银行结算时间，请在每天的03：30~22：00时间段内进行交费，谢谢合作。')
 finally:
 	browser.quit()

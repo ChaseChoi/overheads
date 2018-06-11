@@ -125,7 +125,7 @@ try:
 		# switch to payment page
 		browser.switch_to_window(browser.window_handles[-1])
 except Exception:
-	print("===无效月份!(或 网络连接失败)===")
+	print("===无效宿舍号!(或 网络连接失败)===")
 	browser.quit()
 	sys.exit()
 
@@ -168,4 +168,5 @@ try:
 	img.show()
 except Exception:
 	print('目前是银行结算时间，请在每天的03：30~22：00时间段内进行交费，谢谢合作。')
+finally:
 	browser.quit()

@@ -6,6 +6,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import WebDriverException
 from PIL import Image
 import argparse
 from datetime import datetime
@@ -64,14 +65,13 @@ if previous == 0:
 print('---{}月电费---'.format(previous))
 print('网址: {}\n人员编号: {}\n宿舍: {}'.format(url, myID, position))
 
-# headless browser
-options = Options()
-options.add_argument("headless");
-options.add_argument("window-size=1200x600");
-browser = webdriver.Chrome(chrome_options=options)
-
 # get state of payment
 try:
+	# headless browser
+	options = Options()
+	options.add_argument("headless")
+	options.add_argument("window-size=1200x600")
+	browser = webdriver.Chrome(chrome_options=options)
 	# send request
 	browser.get(url)
 	idInput = WebDriverWait(browser, 3).until(
@@ -128,6 +128,9 @@ try:
 except TimeoutException:
 	print("===无效宿舍号!(或 无网络连接)===")
 	browser.quit()
+	sys.exit()
+except WebDriverException:
+	print("请安装Google Chrome浏览器!")
 	sys.exit()
 
 # check amount of money to pay and choose Wechat 

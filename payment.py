@@ -116,7 +116,7 @@ try:
 
 		# copy to clipboard
 		pyperclip.copy(payCode)
-		print("===Pay code successful copied to clipboard!===")
+		print("===支付码已成功复制到剪贴板===")
 
 		# input paycode
 		payCodeInputBox.clear()
@@ -165,7 +165,7 @@ try:
 		EC.presence_of_element_located((By.CSS_SELECTOR, 'img[src^="/create"]'))
 	)
 	browser.save_screenshot(pathOfScreenShot)
-	print('Scan QR code!')
+	print('请扫描二维码!')
 	img = Image.open(pathOfScreenShot)
 	img.show()
 except TimeoutException:

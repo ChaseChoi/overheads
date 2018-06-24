@@ -126,7 +126,7 @@ try:
 		# switch to payment page
 		browser.switch_to_window(browser.window_handles[-1])
 except TimeoutException:
-	print("===无效宿舍号!(或 无网络连接)===")
+	print("===无支付信息, 请检查宿舍号和网络连接===")
 	browser.quit()
 	sys.exit()
 except WebDriverException:

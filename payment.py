@@ -106,14 +106,15 @@ try:
 	print('{}年{}月 电费'.format(year, month))
 	print('='*16)
 	print('总金额: {} 元'.format(overheads))
-	# forward to payment page
-	payBtnElem.click()
 
 	# show the status of payment
 	if status != None:
 		print('支付情况: 已支付')
 		browser.quit()
 		sys.exit()
+		
+	# forward to payment page
+	payBtnElem.click()
 
 except TimeoutException:
 	print("===无支付信息, 请检查宿舍号和网络连接===")
@@ -136,7 +137,7 @@ try:
 	wechatOption.click()
 	payAllBtn.click()
 except TimeoutException:
-	print('支付信息获取失败!')
+	print('无支付信息!')
 	browser.quit()
 	sys.exit()
 

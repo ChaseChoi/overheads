@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 from selenium import webdriver
-import pyperclip, sys, os
+import sys, os
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
@@ -9,7 +9,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
 from PIL import Image
 import argparse
-from datetime import datetime
 
 def getPositionCode(area, buildingName, unit, roomNum):
 	direction = buildingName[0]
@@ -35,35 +34,27 @@ def getPositionCode(area, buildingName, unit, roomNum):
 # set basic info
 shipai = '01'
 unit = '栋'
-url = 'http://pay.scnu.edu.cn/pay.html'
-filename = 'QRcode.png'
-desktopPath = os.path.expanduser('~/Desktop')
-pathOfScreenShot = os.path.join(desktopPath, filename)
+url = 'https://ssp.scnu.edu.cn/pay/opt_wyjf.aspx'
 
-# get the current year and month
-now = datetime.now()
-year = now.year
-month = now.month
+# default args
+defaultRoom = 401
+defaultBuilding = '西三'
+
 # set argument options
 parser = argparse.ArgumentParser(description='Simple app to pay for overheads in SCNU(tianhe, Guangzhou)')
-parser.add_argument('-p', '--position', default='西三', choices={'西一', '西二', '西三', '西四', '西五', '西六', 
+parser.add_argument('-p', '--position', default=defaultBuilding, choices={'西一', '西二', '西三', '西四', '西五', '西六', 
 	'东四', '东九', '东十', '东十二', '东十三', '东十四', '东十五', '东十六', '东十九', '星河楼', '陶南', '陶北', 
 	'沁园', '研究生公寓'}, help='Specify the position of your dormitory', action='store', dest='position')
-parser.add_argument('-n', '--number', default='401', help='Specify the room number', metavar='{room number}', action='store', dest='number')
+parser.add_argument('-n', '--number', default=defaultRoom, help='Specify the room number', metavar='{room number}', action='store', dest='number')
 args = parser.parse_args()
 # extract args 
 roomNum = args.number
 buildingName = args.position
 
-# generate id number
+# generate position code
 position, positionCode = getPositionCode(shipai, buildingName, unit, roomNum)
-myID = '{}{:02d}{}'.format(year, month, positionCode)
 # display basic info
-previous = (month-1) % 12
-if previous == 0:
-	previous = 12
-print('---{}月电费---'.format(previous))
-print('网址: {}\n人员编号: {}\n宿舍: {}'.format(url, myID, position))
+print('网址: {}\n宿舍编号: {}\n宿舍: {}'.format(url, positionCode, position))
 
 # get state of payment
 try:
@@ -75,56 +66,55 @@ try:
 	# send request
 	browser.get(url)
 	idInput = WebDriverWait(browser, 3).until(
-		EC.presence_of_element_located((By.XPATH, '//*[@id="userId"]'))
-	)
-	nameInput = WebDriverWait(browser, 3).until(
-		EC.presence_of_element_located((By.XPATH, '//*[@id="userName"]'))
+		EC.presence_of_element_located((By.XPATH, '//*[@id="pn_ssh"]'))
 	)
 	searchButton = WebDriverWait(browser, 3).until(
-		EC.presence_of_element_located((By.XPATH, '//*[@id="queryPayCodeBtn"]'))
+		EC.presence_of_element_located((By.XPATH, '//*[@id="pn_sc"]'))
 	)
-
 	idInput.clear()
-	idInput.send_keys(myID)
-	nameInput.clear()
-	nameInput.send_keys(position)
+	idInput.send_keys(positionCode)
+	# send search request
 	searchButton.click()
 
-	statusElem = WebDriverWait(browser, 3).until(
-		EC.presence_of_element_located((By.XPATH, '//*[@id="payCodeDiv"]/table/tbody/tr[3]/td[5]'))
+	yearElem = WebDriverWait(browser, 3).until(
+		EC.presence_of_element_located((By.XPATH, '//*[@id="gv1"]/tbody/tr[2]/td[4]'))
 	)
-	payCodeElem = WebDriverWait(browser, 3).until(
-		EC.presence_of_element_located((By.XPATH, '//*[@id="payCodeDiv"]/table/tbody/tr[3]/td[4]/a'))
+
+	monthElem = WebDriverWait(browser, 3).until(
+		EC.presence_of_element_located((By.XPATH, '//*[@id="gv1"]/tbody/tr[2]/td[5]'))
 	)
-	payCodeInputBox = WebDriverWait(browser, 3).until(
-		EC.presence_of_element_located((By.XPATH, '//*[@id="pwd"]'))
+
+	overheadsElem = WebDriverWait(browser, 3).until(
+		EC.presence_of_element_located((By.XPATH, '//*[@id="gv1"]/tbody/tr[2]/td[7]'))
 	)
-	confirmPayCodeBtn = WebDriverWait(browser, 3).until(
-		EC.presence_of_element_located((By.XPATH, '//*[@id="payForm"]/table/tbody/tr[5]/td/input'))
+
+	payBtnElem = WebDriverWait(browser, 3).until(
+		EC.presence_of_element_located((By.XPATH, '//*[@id="gv1"]/tbody/tr[2]/td[1]/a'))
 	)
-	status = statusElem.text
+
+	payStatus = WebDriverWait(browser, 3).until(
+		EC.presence_of_element_located((By.XPATH, '//*[@id="gv1_ctl02_0"]'))
+	) 
+	
+	year = yearElem.text
+	month = monthElem.text
+	overheads = overheadsElem.text
+	# check need for paying
+	status = payStatus.get_attribute('checked')
+	
 	print('='*16)
-	print('支付情况: {}'.format(status))
+	print('{}年{}月 电费'.format(year, month))
 	print('='*16)
-	if status == '已支付':
+	print('总金额: {} 元'.format(overheads))
+	# forward to payment page
+	payBtnElem.click()
+
+	# show the status of payment
+	if status != None:
+		print('支付情况: 已支付')
 		browser.quit()
 		sys.exit()
-	else:
-		# get payment code
-		payCode = payCodeElem.text
-		print('支付码: {}'.format(payCode))
 
-		# copy to clipboard
-		pyperclip.copy(payCode)
-		print("===支付码已成功复制到剪贴板===")
-
-		# input paycode
-		payCodeInputBox.clear()
-		payCodeInputBox.send_keys(payCode);
-		# confirm paycode
-		confirmPayCodeBtn.click()
-		# switch to payment page
-		browser.switch_to_window(browser.window_handles[-1])
 except TimeoutException:
 	print("===无支付信息, 请检查宿舍号和网络连接===")
 	browser.quit()
@@ -133,13 +123,8 @@ except WebDriverException:
 	print("请安装Google Chrome浏览器!")
 	sys.exit()
 
-# check amount of money to pay and choose Wechat 
+# choose Wechat option
 try:
-	amount = WebDriverWait(browser, 5).until(
-		EC.presence_of_element_located((By.XPATH, '//*[@id="print_pay"]/table/tbody/tr[6]/td[2]/strong'))
-	)
-	print('金额: {} 元'.format(amount.text))
-
 	wechatOption = WebDriverWait(browser, 5).until(
 		EC.element_to_be_clickable((By.ID, 'bank1'))
 	)
@@ -164,8 +149,14 @@ try:
 	qrCodeLoaded = WebDriverWait(browser, 5).until(
 		EC.presence_of_element_located((By.CSS_SELECTOR, 'img[src^="/create"]'))
 	)
+	# construct the path to save the screenshot
+	desktopPath = os.path.expanduser('~/Desktop')
+	filename = '{}.{}-{}.png'.format(year, month, position)
+	pathOfScreenShot = os.path.join(desktopPath, filename)
 	browser.save_screenshot(pathOfScreenShot)
+	
 	print('请扫描二维码!')
+	# open the image
 	img = Image.open(pathOfScreenShot)
 	img.show()
 except TimeoutException:

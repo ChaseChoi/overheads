@@ -77,24 +77,24 @@ try:
 	searchButton.click()
 
 	yearElem = WebDriverWait(browser, 3).until(
-		EC.presence_of_element_located((By.XPATH, '//*[@id="gv1"]/tbody/tr[2]/td[4]'))
+		EC.presence_of_element_located((By.XPATH, '//*[@id="gv1"]/tbody/tr[last()]/td[4]'))
 	)
 
 	monthElem = WebDriverWait(browser, 3).until(
-		EC.presence_of_element_located((By.XPATH, '//*[@id="gv1"]/tbody/tr[2]/td[5]'))
+		EC.presence_of_element_located((By.XPATH, '//*[@id="gv1"]/tbody/tr[last()]/td[5]'))
 	)
 
 	overheadsElem = WebDriverWait(browser, 3).until(
-		EC.presence_of_element_located((By.XPATH, '//*[@id="gv1"]/tbody/tr[2]/td[7]'))
+		EC.presence_of_element_located((By.XPATH, '//*[@id="gv1"]/tbody/tr[last()]/td[7]'))
 	)
 
 	payBtnElem = WebDriverWait(browser, 3).until(
-		EC.presence_of_element_located((By.XPATH, '//*[@id="gv1"]/tbody/tr[2]/td[1]/a'))
+		EC.presence_of_element_located((By.XPATH, '//*[@id="gv1"]/tbody/tr[last()]/td[1]/a'))
 	)
 
 	payStatus = WebDriverWait(browser, 3).until(
-		EC.presence_of_element_located((By.XPATH, '//*[@id="gv1_ctl02_0"]'))
-	) 
+		EC.presence_of_element_located((By.XPATH, '//*[@id="gv1"]/tbody/tr[last()]/td[10]/span/input'))
+	)
 	
 	year = yearElem.text
 	month = monthElem.text
@@ -137,7 +137,7 @@ try:
 	wechatOption.click()
 	payAllBtn.click()
 except TimeoutException:
-	print('无支付信息!')
+	print('支付情况: 已支付')
 	browser.quit()
 	sys.exit()
 
